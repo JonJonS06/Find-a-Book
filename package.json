@@ -15,7 +15,7 @@
   "dependencies": {
     "@apollo/client": "^3.8.3",
     "apollo-server-express": "^2.15.0",
-    "graphql": "^15.8.0"
+    "graphql": ""
   },
   "devDependencies": {
     "concurrently": ""
