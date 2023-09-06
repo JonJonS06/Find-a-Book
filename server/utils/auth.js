@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 // set token secret and expiration date
-const secret = "mysecretsshhhhh";
+const secret = "process.env.JWT_SECRET";
 const expiration = "2h";
 
 module.exports = {
@@ -29,6 +29,7 @@ module.exports = {
       req.user = data;
     } catch {
       console.log("Invalid token");
+      return console.error({ message: "Invalid Token" });
     }
 
     return req;
