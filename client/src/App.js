@@ -13,7 +13,7 @@ import Navbar from "./components/Navbar";
 
 const httpLink = createHttpLink({
   uri: "/graphql",
-  target: "http://127.0.0.1:3001",
+  target: "http://127.0.0.1:27017",
   changeOrigin: true,
   secure: false,
 });
