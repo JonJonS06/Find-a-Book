@@ -6,15 +6,17 @@ const resolvers = {
   Query: {
     me: async (parent, args, context) => {
       if (context.user) {
-        const userData = await User.findOne({ _id: context.user._id });
+        const userData = await User.findOne({ _id: context.user._id }).select(
+          "-__v -password"
+        );
         return userData;
       }
       throw new AuthenticationError("Not Logged In");
     },
   },
   Mutation: {
-    addUser: async (parent, { username, email, password }) => {
-      const user = await User.create({ username, email, password });
+    addUser: async (parent, args) => {
+      const user = await User.create(args);
       const token = signToken(user);
       return { token, user };
     },
@@ -30,35 +32,27 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
-    saveBook: async (
-      parent,
-      { bookId, authors, description, title, image, link },
-      context
-    ) => {
+    saveBook: async (parent, { newBook }, context) => {
       if (context.user) {
-        return User.findOneAndUpdate(
+        const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          {
-            $addToSet: {
-              savedBooks: { bookId, authors, description, title, image, link },
-            },
-          },
+          { $push: { savedBooks: newBook } },
           { new: true, runValidators: true }
         );
-      } else {
-        throw new AuthenticationError("Could Not Delete Book");
+        return updatedUser;
       }
+      throw new AuthenticationError("You Need To Be Logged In");
     },
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
-        return User.findOneAndUpdate(
+        const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { savedBooks: { bookId } } },
-          { new: true, runValidators: true }
+          { $pull: { savedBooks: { bookId: bookId } } },
+          { new: true }
         );
-      } else {
-        throw new AuthenticationError("You need to be logged in!");
+        return updatedUser;
       }
+      throw new AuthenticationError("You need to be logged in!");
     },
   },
 };
